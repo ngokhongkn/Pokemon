@@ -16,6 +16,7 @@ import com.coccoc.pokemonlearning.utils.Status
 import com.coccoc.pokemonlearning.utils.observe
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.android.schedulers.AndroidSchedulers
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -40,14 +41,14 @@ class MainActivity : AppCompatActivity() {
             .subscribe(
                 {
                     list ->
+                    Timber.d("list: " + list.size)
                     binding.progressbar.visibility = View.GONE
                     mAdapter.submitList(list)
                     binding.recyclerView.adapter = mAdapter
                 },
-                {
-                    e ->
+                { e ->
                     binding.progressbar.visibility = View.GONE
-                    Log.d("DungTest", "onCreate error: ${e.localizedMessage}")
+                    Timber.d("onCreate error: " + e.localizedMessage)
                 }
             )
     }
