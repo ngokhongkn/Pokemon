@@ -3,11 +3,13 @@ package com.coccoc.pokemonlearning.di;
 import com.coccoc.pokemonlearning.network.HttpRequestInterceptor
 import com.coccoc.pokemonlearning.network.PokedexClient
 import com.coccoc.pokemonlearning.network.PokedexService
+import com.coccoc.pokemonlearning.repository.MainRepository
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.reactivex.disposables.CompositeDisposable
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -50,4 +52,9 @@ object NetworkModule {
         return PokedexClient(pokedexService)
     }
 
+    @Provides
+    @Singleton
+    fun provideMainRepository(pokedexClient: PokedexClient): MainRepository {
+        return MainRepository(pokedexClient)
+    }
 }

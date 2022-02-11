@@ -6,7 +6,7 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class MainRepository @Inject constructor(
-    private val  pokedexClient: PokedexClient
+    private val pokedexClient: PokedexClient
 ){
     fun fetchPokemonList(
         page: Int

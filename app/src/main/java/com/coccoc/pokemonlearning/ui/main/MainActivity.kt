@@ -1,7 +1,9 @@
 package com.coccoc.pokemonlearning.ui.main
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
@@ -13,6 +15,7 @@ import com.coccoc.pokemonlearning.ui.adapter.PokemonAdapter
 import com.coccoc.pokemonlearning.utils.Status
 import com.coccoc.pokemonlearning.utils.observe
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.android.schedulers.AndroidSchedulers
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -20,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var mAdapter: PokemonAdapter
 
+    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -29,25 +33,22 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         binding.recyclerView.setHasFixedSize(true)
 
-        mainViewModel.fetchPokemonList()
-
-        mainViewModel.getPokemonList().observe(this, Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
+        mAdapter = PokemonAdapter()
+        binding.recyclerView.adapter = mAdapter
+        binding.progressbar.visibility = View.VISIBLE
+        mainViewModel.pokemonList.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+                    list ->
                     binding.progressbar.visibility = View.GONE
-                    Toast.makeText(this, "success = " + it.data?.results?.size, Toast.LENGTH_LONG).show()
-                    mAdapter = PokemonAdapter(it.data?.results!!)
+                    mAdapter.submitList(list)
                     binding.recyclerView.adapter = mAdapter
-                }
-                Status.ERROR -> {
+                },
+                {
+                    e ->
                     binding.progressbar.visibility = View.GONE
-                    Toast.makeText(this, "error = " + it.message, Toast.LENGTH_LONG).show()
+                    Log.d("DungTest", "onCreate error: ${e.localizedMessage}")
                 }
-
-                Status.LOADING -> {
-                    binding.progressbar.visibility = View.VISIBLE
-                }
-            }
-        })
+            )
     }
 }

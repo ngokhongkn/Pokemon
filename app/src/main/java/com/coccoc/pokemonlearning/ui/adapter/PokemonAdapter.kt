@@ -2,14 +2,15 @@ package com.coccoc.pokemonlearning.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.coccoc.pokemonlearning.databinding.ItemPokemonBinding
 import com.coccoc.pokemonlearning.model.Pokemon
 
-class PokemonAdapter constructor(
-    private val mPokemonList: List<Pokemon>
-) : RecyclerView.Adapter<PokemonAdapter.PokemonAdapterViewHolder>() {
+class PokemonAdapter : PagedListAdapter<Pokemon, PokemonAdapter.PokemonAdapterViewHolder>(
+    pokemonDiff) {
 
 
     class PokemonAdapterViewHolder(private var itemPokemonBinding: ItemPokemonBinding) :
@@ -26,10 +27,18 @@ class PokemonAdapter constructor(
     }
 
     override fun onBindViewHolder(holder: PokemonAdapterViewHolder, position: Int) {
-        holder.bind(mPokemonList[position])
+        getItem(position)?.let { holder.bind(it) }
     }
 
-    override fun getItemCount(): Int {
-        return mPokemonList.size
+    companion object {
+        val pokemonDiff = object : DiffUtil.ItemCallback<Pokemon>() {
+            override fun areItemsTheSame(old: Pokemon, new: Pokemon): Boolean {
+                return old.name == new.name
+            }
+
+            override fun areContentsTheSame(old: Pokemon, new: Pokemon): Boolean {
+                return old == new
+            }
+        }
     }
 }
